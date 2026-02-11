@@ -4,11 +4,17 @@ import { avatarKeyMovements, avatarLoader, avatarSoundMaker, getMixer } from "..
 import { Room } from "../components/room";
 import { startScreenShare } from "../utils/screenShare";
 import { addScreen, addStream } from "../components/screen";
+import { connectWebSocket } from "../utils/webSocket/socket";
+
+export let conferenceScene;
 export function DiscussionRoom(canvas){
+  conferenceScene = new THREE.Scene();
+  //connect to web socket
+  connectWebSocket();
+
    initThree(canvas)
    const camera = getCamera();
    const clock = new THREE.Clock();
-   const scene = new THREE.Scene();
    const listener = new THREE.AudioListener();
    const sound = new THREE.Audio(listener);
    const audioLoader = new THREE.AudioLoader();
@@ -25,36 +31,36 @@ export function DiscussionRoom(canvas){
   window.addEventListener("keydown", async (e) => {
   if (e.key.toLowerCase() === "p") {
     const stream = await startScreenShare();
-    addStream(stream, scene);
+    addStream(stream, conferenceScene);
   }
 });
 
 
    camera.add(listener)
-   scene.background = new THREE.Color(0xeeeeee)
+   conferenceScene.background = new THREE.Color(0xeeeeee)
    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-   scene.add(ambientLight)
+   conferenceScene.add(ambientLight)
 
    const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
   dirLight.position.set(5, 10, 5);
-  scene.add(dirLight);
+  conferenceScene.add(dirLight);
 
 
   //  const controls = new OrbitControls(camera, canvas);
   //  controls.enableDamping = true
    
   const room = Room()
-  scene.add(room)
+  conferenceScene.add(room)
 
   //add screen to room
-  addScreen(scene)
+  addScreen(conferenceScene)
 
     //add avatar to the room
-    avatarLoader(scene, sound)
+    avatarLoader(conferenceScene)
 
    camera.position.set(0,2,4.5);
    
-   setScene(scene, ()=>{
+   setScene(conferenceScene, ()=>{
     avatarSoundMaker(analyser)
     // controls.update()
     const delta = clock.getDelta();

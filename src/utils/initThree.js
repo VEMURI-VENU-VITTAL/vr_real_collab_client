@@ -35,7 +35,6 @@ export function setScene(scene, updateFn){
    renderer.setAnimationLoop(() => {
         updateFn?.()
         renderer.render(scene,camera);
-        // window.requestAnimationFrame(rendererLoop)
     });
 }
 
