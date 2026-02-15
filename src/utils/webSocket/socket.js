@@ -1,11 +1,12 @@
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import { subscribeToRoom } from "./subscriptions";
 
 let stompClient = null;
 let isConnected = false;
 
 export function connectWebSocket() {
-  if (stompClient && isConnected) return;
+  if (stompClient && isConnected) return stompClient;
 
   stompClient = new Client({
     webSocketFactory: () =>
@@ -18,6 +19,9 @@ export function connectWebSocket() {
     onConnect: () => {
       console.log("WebSocket connected");
       isConnected = true;
+
+        //listen to web socket
+        subscribeToRoom(stompClient)
     },
 
     onDisconnect: () => {
@@ -31,6 +35,7 @@ export function connectWebSocket() {
   });
 
   stompClient.activate();
+  return stompClient;
 }
 
 export function isSocketConnected(){

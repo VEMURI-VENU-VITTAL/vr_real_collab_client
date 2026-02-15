@@ -12,7 +12,6 @@ const routes = {
 
 export const router = ()=>{
     const path = window.location.pathname;
-    console.log(path)
     const view = routes[path] || "Login";
     document.body.innerHTML = ""
     if(view=="DiscussionRoom"){
@@ -21,10 +20,10 @@ export const router = ()=>{
         DiscussionRoom(canvas)
     }
     else if(view=="Login"){
-        document.appendChild(LoginPage(false))
+        document.body.appendChild(LoginPage(false))
     }
     else if(view=="Register"){
-        document.appendChild(LoginPage(true))
+        document.body.appendChild(LoginPage(true))
     }
     else{
         document.body.appendChild(view());

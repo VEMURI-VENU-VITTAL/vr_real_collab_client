@@ -1,16 +1,16 @@
 import { getStompClient, isSocketConnected } from "./socket";
 
-let stompCLient = getStompClient();
-export function subscribeToRoom(roomId, onMessage){
-    if(!isSocketConnected()){
+export function subscribeToRoom(stompClient){
+    const roomId = sessionStorage.getItem("sessionId")
+    if(!stompClient){
         return;
     }
 
-    return stompCLient.subscibe(
-        `topic/room/${roomId}`,
+    return stompClient.subscribe(
+        `/topic/${roomId}/event`,
         (message)=>{
             const payload = JSON.parse(message.body);
-            onMessage(payload)
+            console.log("web socket message: ", payload)
         }
     )
 }

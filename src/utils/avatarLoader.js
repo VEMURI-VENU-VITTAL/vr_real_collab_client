@@ -1,53 +1,87 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three";
+import { sendEvent } from "./webSocket/publisher";
+import { createAvatarMovement } from "./event";
 
 let avatar;
 let mixer;
 const keys = {};
 let player;
 let faceMesh;
-
-export function avatarLoader(scene, sound) {
+let gltf;
+let walkAction, idleAction;
+let isWalking=false;
+export function createAvatar() {
   const loader = new GLTFLoader();
 
-  loader.load("/boy_mouthMovement.glb", (gltf) => {
-    avatar = gltf.scene;             
-    avatar.scale.set(0.8, 0.8, 0.8);
-    avatar.position.set(0, 0, 0);
-    avatar.rotation.y = Math.PI;
+  return new Promise((resolve, reject) => {
+    loader.load(
+      "/boy_mouthMovement.glb",
+      (newGltf) => {
+        const newAvatar = newGltf.scene;
+        let newFaceMesh = null;
 
-    avatar.traverse((obj)=>{
-        if (obj.isMesh && obj.morphTargetDictionary) {
-            faceMesh = obj;
-            console.log("Morph targets:", obj.morphTargetDictionary);
+        newAvatar.scale.set(0.8, 0.8, 0.8);
+        newAvatar.position.set(0, 0, 0);
+        newAvatar.rotation.y = Math.PI;
+
+        newAvatar.traverse((obj) => {
+          if (obj.isMesh && obj.morphTargetDictionary) {
+            newFaceMesh = obj;
+          }
+        });
+
+        const newMixer = new THREE.AnimationMixer(newAvatar);
+
+        const newWalkAction = newMixer.clipAction(
+          newGltf.animations.find((animation)=>animation.name=="Walk")
+        )
+
+        const newIdleAction = newMixer.clipAction(
+          newGltf.animations.find((animation)=>animation.name=="Idle")
+        )
+
+        if (newGltf?.animations?.length) {
+          const action = newMixer.clipAction(newGltf?.animations[0]);
+          action.timeScale = 0.2;
+          action.play();
         }
-    })
 
+        // resolve ONLY when ready
+        resolve({ newAvatar, newFaceMesh, newMixer, newWalkAction, newIdleAction });
+      },
+      undefined,
+      (err) => reject(err)
+    );
+  });
+}
+
+
+export function avatarLoader(scene) {
+  createAvatar().then(({ newAvatar, newFaceMesh, newMixer, newWalkAction, newIdleAction }) => {
+    scene.add(newAvatar);
+    avatar = newAvatar
+    faceMesh = newFaceMesh;
+    mixer = newMixer
+    walkAction = newWalkAction
+    idleAction = newIdleAction
+  
     player = new THREE.Group();
     player.add(avatar)
 
     player.position.set(0,0,0)
     scene.add(player);
 
-    // Animation mixer must use the scene
-    mixer = new THREE.AnimationMixer(avatar);
+    //send event through web socket to register this avatar for all the users
+    const event = createAvatarMovement(avatar, "APPEARS");
 
-    // Play first animation if exists
-    if (gltf.animations && gltf.animations.length > 0) {
-      const action = mixer.clipAction(gltf.animations[0]);
-      action.timeScale = 0.2;
-      action.play();
-    }
-  });
+    window.addEventListener("keydown", (e) => {
+      keys[e.key.toLowerCase()] = true;
+    });
 
-
-
-  window.addEventListener("keydown", (e) => {
-    keys[e.key.toLowerCase()] = true;
-  });
-
-  window.addEventListener("keyup", (e) => {
-    keys[e.key.toLowerCase()] = false;
+    window.addEventListener("keyup", (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
   });
 }
 
@@ -56,28 +90,55 @@ export function getMixer() {
 }
 
 export function avatarKeyMovements(camera) {
+  const isPlayerMoved = keys["w"] || keys["s"] || keys["a"] || keys["d"];
   if (!player) return;
-
+  
   const moveSpeed = 0.005;
   const rotateSpeed = 0.006;
+  if(isPlayerMoved){
 
-  if (keys["w"]) {
-    player.translateZ(-moveSpeed);
+    // ▶ START WALK
+    if (!isWalking) {
+      idleAction.fadeOut(0.3);
+      walkAction
+        .reset()
+        .fadeIn(0.3)
+        .play();
+      isWalking = true;
+    }
+
+    if (keys["w"]) {
+      player.translateZ(-moveSpeed);
+    }
+
+    if (keys["s"]) {
+      player.translateZ(moveSpeed);
+    }
+
+    if (keys["a"]) {
+      player.rotation.y += rotateSpeed;
+    }
+
+    if (keys["d"]) {
+      player.rotation.y -= rotateSpeed;
+    }
+
+    updateThirdPersonCamera(player, camera);
+    
+    //publish avatar position
+    const event = createAvatarMovement(player)
+    walkAction.fadeOut(0.3)
   }
 
-  if (keys["s"]) {
-    player.translateZ(moveSpeed);
+  if (!isPlayerMoved && isWalking) {
+    walkAction.fadeOut(0.3);
+    idleAction
+      .reset()
+      .fadeIn(0.3)
+      .play();
+    isWalking = false;
   }
 
-  if (keys["a"]) {
-    player.rotation.y += rotateSpeed;
-  }
-
-  if (keys["d"]) {
-    player.rotation.y -= rotateSpeed;
-  }
-
-  updateThirdPersonCamera(player, camera);
 }
 
 
@@ -92,7 +153,6 @@ export function avatarSoundMaker(analyser){
   if (dict.MouthOpen !== undefined) {
     influences[dict.MouthOpen] = mouthValue;
   }
-  console.log(faceMesh.morphTargetInfluences)
   }
 
 

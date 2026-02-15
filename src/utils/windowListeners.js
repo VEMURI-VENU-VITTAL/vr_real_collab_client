@@ -11,7 +11,6 @@ window.addEventListener("keydown", async (e) => {
     if (sound && !sound.isPlaying) {
 
       sound.play();
-      console.log("isPlaying:", audioContext.state);
       analyser = new THREE.AudioAnalyser(sound, 32);
     }
   }
