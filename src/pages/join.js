@@ -1,5 +1,6 @@
 import { Button } from "../components/button"
-import { createSession } from "../utils/network";
+import { Input } from "../components/input";
+import { createSession, findSession } from "../utils/network";
 
 export function JoinSession(){
     const root = document.createElement("div");
@@ -11,6 +12,18 @@ export function JoinSession(){
     root.style.alignItems = "center";
     root.style.justifyContent = "center";
     root.style.gap = "20px"
+
+    //add event listeners for clicking enter button 
+    window.addEventListener("keydown", (event)=>{
+        if(event.key==="Enter"){
+            const existingSessionInput = oldSessionElement.input;
+            const sessionIdInput = existingSessionInput.value;
+            if(sessionIdInput!=""){
+                findSession(sessionIdInput)
+            }
+            
+        }
+    })
 
     const newSessionDiv = document.createElement("div");
     newSessionDiv.className = "new-session";
@@ -33,12 +46,12 @@ export function JoinSession(){
 
     newSessionDiv.appendChild(newSessionButton)
 
-    const oldSessionButton = Button({
-        text:"Join With Id",
-        isShadow:true
+    const oldSessionElement = Input({
+        placeHolder:"Enter Session Id",
+        labelText:""
     })
 
-    oldSessionDiv.appendChild(oldSessionButton)
+    oldSessionDiv.appendChild(oldSessionElement.root)
 
     root.appendChild(newSessionDiv)
     root.appendChild(oldSessionDiv)

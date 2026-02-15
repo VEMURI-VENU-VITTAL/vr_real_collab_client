@@ -11,12 +11,14 @@ export function createAvatarMovement(player, type){
         z:player.position.z
       },
       quaternion:{
-        x:player.rotation.x,
-        y:player.rotation.y,
-        z:player.rotation.z,
-        w:player.rotation.w
+        x:player.quaternion.x,
+        y:player.quaternion.y,
+        z:player.quaternion.z,
+        w:player.quaternion.w
       }
     }
+
+    console.log("remote player moving event: ", player)
 
     sendEvent(event.sessionId, event)
 

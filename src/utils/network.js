@@ -1,4 +1,5 @@
 import { redirect } from "./pageRouter";
+import { avatarMap } from "./remoteAvatars";
 import { getCall, postcall } from "./routing"
 
 export const submitLogin=async (isRegister, userName, password)=>{
@@ -25,6 +26,16 @@ export const createSession = async(userId)=>{
     if(data.status=="SUCCESS"){
         sessionStorage.setItem("sessionId", data?.data?.id);
         redirect("/room")
+    }
+}
+
+export const findSession = async(sessionId)=>{
+    const data = await getCall(import.meta.env.VITE_API_BASE+`session/find?sessionId=${sessionId}`);
+    if(data.status=="SUCCESS"){
+        sessionStorage.setItem("sessionId", data?.data?.id)
+        redirect("/room")
+
+        avatarMap={}
     }
 }
 

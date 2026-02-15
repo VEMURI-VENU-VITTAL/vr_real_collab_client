@@ -21,8 +21,6 @@ export function createAvatar() {
         const newAvatar = newGltf.scene;
         let newFaceMesh = null;
 
-        newAvatar.scale.set(0.8, 0.8, 0.8);
-        newAvatar.position.set(0, 0, 0);
         newAvatar.rotation.y = Math.PI;
 
         newAvatar.traverse((obj) => {
@@ -41,11 +39,18 @@ export function createAvatar() {
           newGltf.animations.find((animation)=>animation.name=="Idle")
         )
 
-        if (newGltf?.animations?.length) {
-          const action = newMixer.clipAction(newGltf?.animations[0]);
-          action.timeScale = 0.2;
-          action.play();
-        }
+        // if (newGltf?.animations?.length) {
+        //   const action = newMixer.clipAction(newGltf?.animations[0]);
+        //   action.timeScale = 0.2;
+        //   action.play();
+        // }
+        newWalkAction.enabled = true;
+        newIdleAction.enabled = true;
+
+        newWalkAction.setLoop(THREE.LoopRepeat);
+        newIdleAction.setLoop(THREE.LoopRepeat);
+
+        newIdleAction.play()
 
         // resolve ONLY when ready
         resolve({ newAvatar, newFaceMesh, newMixer, newWalkAction, newIdleAction });
@@ -69,6 +74,7 @@ export function avatarLoader(scene) {
     player = new THREE.Group();
     player.add(avatar)
 
+    avatar.scale.set(0.8,0.8,0.8)
     player.position.set(0,0,0)
     scene.add(player);
 
@@ -105,6 +111,8 @@ export function avatarKeyMovements(camera) {
         .fadeIn(0.3)
         .play();
       isWalking = true;
+
+      createAvatarMovement(player, "MOVEMENT")
     }
 
     if (keys["w"]) {
@@ -126,8 +134,7 @@ export function avatarKeyMovements(camera) {
     updateThirdPersonCamera(player, camera);
     
     //publish avatar position
-    const event = createAvatarMovement(player)
-    walkAction.fadeOut(0.3)
+    createAvatarMovement(player, "MOVING")
   }
 
   if (!isPlayerMoved && isWalking) {
@@ -137,6 +144,7 @@ export function avatarKeyMovements(camera) {
       .fadeIn(0.3)
       .play();
     isWalking = false;
+    createAvatarMovement(player, "IDLE")
   }
 
 }

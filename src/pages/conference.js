@@ -5,6 +5,7 @@ import { Room } from "../components/room";
 import { startScreenShare } from "../utils/screenShare";
 import { addScreen, addStream } from "../components/screen";
 import { connectWebSocket } from "../utils/webSocket/socket";
+import { avatarMap } from "../utils/remoteAvatars";
 
 export let conferenceScene;
 export function DiscussionRoom(canvas){
@@ -65,6 +66,9 @@ export function DiscussionRoom(canvas){
     // controls.update()
     const delta = clock.getDelta();
     getMixer()?.update(delta)
+    Object.values(avatarMap).forEach(user => {
+      user.mixer?.update(delta);
+    });
     avatarKeyMovements(camera);
    })
 }

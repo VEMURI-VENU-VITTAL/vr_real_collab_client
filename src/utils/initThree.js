@@ -4,7 +4,15 @@ import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
 let renderer, camera;
 let currentScene;
 
+
 export function initThree(canvas){
+    if (renderer) {
+  renderer.dispose();
+  renderer.forceContextLoss();
+  renderer.domElement = null;
+  renderer = null;
+}
+
         camera = new THREE.PerspectiveCamera(
         35,
         window.innerWidth/window.innerHeight,
