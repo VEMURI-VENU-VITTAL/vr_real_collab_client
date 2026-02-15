@@ -11,13 +11,17 @@ export function Input({
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: "8px",
+    gap: !labelText!=""?"8px":"0px",
     width: width,
     margin: "0 auto"
   });
 
-  const label = document.createElement("label");
-  label.textContent = labelText;
+  if(labelText!=""){
+    const label = document.createElement("label");
+    label.textContent = labelText;
+
+    root.appendChild(label);
+  }
 
   const input = document.createElement("input");
   input.type = inputType;
@@ -28,10 +32,10 @@ export function Input({
     width: "100%",
     borderRadius: "10px",
     boxSizing: "border-box",
-    padding: "6px 10px"
+    padding: "6px 10px",
+    margin:0
   });
 
-  root.appendChild(label);
   root.appendChild(input);
 
   return {root, input};

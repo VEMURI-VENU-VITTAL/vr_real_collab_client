@@ -1,3 +1,4 @@
+import { createRemoteAvatar } from "../remoteAvatars";
 import { getStompClient, isSocketConnected } from "./socket";
 
 export function subscribeToRoom(stompClient){
@@ -9,8 +10,8 @@ export function subscribeToRoom(stompClient){
     return stompClient.subscribe(
         `/topic/${roomId}/event`,
         (message)=>{
-            const payload = JSON.parse(message.body);
-            console.log("web socket message: ", payload)
+            const event = JSON.parse(message.body);
+            createRemoteAvatar(event)
         }
     )
 }
