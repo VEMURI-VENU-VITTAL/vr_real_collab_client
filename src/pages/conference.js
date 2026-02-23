@@ -1,6 +1,6 @@
 import * as THREE from "three"
 import { getCamera, initThree, setScene } from "../utils/initThree";
-import { avatarKeyMovements, avatarLoader, avatarSoundMaker, getMixer } from "../utils/avatarLoader";
+import { animateLipSync, avatarKeyMovements, avatarLoader, getMixer } from "../utils/avatarLoader";
 import { Room } from "../components/room";
 import { startScreenShare } from "../utils/screenShare";
 import { addScreen, addStream } from "../components/screen";
@@ -13,14 +13,15 @@ export function DiscussionRoom(canvas){
   //connect to web socket
   connectWebSocket();
 
+  //call audio setup code
+  // audioWindowListeners()
+  
    initThree(canvas)
    const camera = getCamera();
    const clock = new THREE.Clock();
    const listener = new THREE.AudioListener();
    const sound = new THREE.Audio(listener);
    const audioLoader = new THREE.AudioLoader();
-   const audioContext = THREE.AudioContext.getContext();
-   let analyser;
 
    //add sound
    audioLoader.load("/testAudio.mp3", (buffer) => {
@@ -62,7 +63,6 @@ export function DiscussionRoom(canvas){
    camera.position.set(0,2,4.5);
    
    setScene(conferenceScene, ()=>{
-    avatarSoundMaker(analyser)
     // controls.update()
     const delta = clock.getDelta();
     getMixer()?.update(delta)
@@ -70,5 +70,7 @@ export function DiscussionRoom(canvas){
       user.mixer?.update(delta);
     });
     avatarKeyMovements(camera);
+    
+    animateLipSync()
    })
 }

@@ -13,7 +13,8 @@ export default defineConfig({
     allowedHosts: [
       "localhost",
       "127.0.0.1",
-      "unhydrolized-hardheartedly-jan.ngrok-free.dev"
+      "unhydrolized-hardheartedly-jan.ngrok-free.dev",
+      "knock-qualifications-pets-laughing.trycloudflare.com"
     ]
   }
 });

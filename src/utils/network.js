@@ -34,7 +34,6 @@ export const findSession = async(sessionId)=>{
     if(data.status=="SUCCESS"){
         sessionStorage.setItem("sessionId", data?.data?.id)
         redirect("/room")
-
         avatarMap={}
     }
 }
