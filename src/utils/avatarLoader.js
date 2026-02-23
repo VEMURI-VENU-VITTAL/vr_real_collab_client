@@ -1,7 +1,9 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three";
-import { sendEvent } from "./webSocket/publisher";
 import { createAvatarMovement } from "./event";
+import { getRmsLoudness, mapMouthOpen } from "./audioSetup/analyzer";
+import { peers } from "./audioSetup/setup";
+import { avatarMap } from "./remoteAvatars";
 
 let avatar;
 let mixer;
@@ -23,14 +25,19 @@ export function createAvatar() {
 
         newAvatar.rotation.y = Math.PI;
 
+        console.log("morph: ", newAvatar)
         newAvatar.traverse((obj) => {
           if (obj.isMesh && obj.morphTargetDictionary) {
             newFaceMesh = obj;
           }
         });
 
+        //set MouthOpen to 0
+        setMorph(newFaceMesh, "MouthOpen", 0)
+
         const newMixer = new THREE.AnimationMixer(newAvatar);
 
+        console.log("animations: ", newGltf.animations)
         const newWalkAction = newMixer.clipAction(
           newGltf.animations.find((animation)=>animation.name=="Walk")
         )
@@ -51,6 +58,8 @@ export function createAvatar() {
         newIdleAction.setLoop(THREE.LoopRepeat);
 
         newIdleAction.play()
+
+        console.log("facemesh; ", newFaceMesh)
 
         // resolve ONLY when ready
         resolve({ newAvatar, newFaceMesh, newMixer, newWalkAction, newIdleAction });
@@ -150,20 +159,15 @@ export function avatarKeyMovements(camera) {
 }
 
 
-export function avatarSoundMaker(analyser){
-  if(faceMesh && analyser){
-     const volume = analyser.getAverageFrequency(); // 0–255
-  const mouthValue = Math.min(volume / 80, 1);   // normalize
+function setMorph(mesh, name, value) {
+  const dict = mesh.morphTargetDictionary;
+  const inf = mesh.morphTargetInfluences;
+  if (!dict || !inf) return;
 
-  const dict = faceMesh.morphTargetDictionary;
-  const influences = faceMesh.morphTargetInfluences;
+  const idx = dict[name];
+  if (idx === undefined) return;
 
-  if (dict.MouthOpen !== undefined) {
-    influences[dict.MouthOpen] = mouthValue;
-  }
-  }
-
-
+  inf[idx] = value;
 }
 
 const cameraOffset = new THREE.Vector3(0, 2, 5);
@@ -185,4 +189,20 @@ function updateThirdPersonCamera(player, camera) {
     tempVec.y + 1.5,
     tempVec.z
   );
+}
+
+//update mouth for every frame 
+export function animateLipSync() {
+
+  for (const [remoteUserId, peer] of peers.entries()) {
+    const remoteAtatarFaceMesh = avatarMap?.[remoteUserId]?.faceMesh
+    console.log(peer, "rms peer")
+    if (!peer.voice || !remoteAtatarFaceMesh) continue;
+
+    const rms = getRmsLoudness(peer.voice.analyser, peer.voice.timeData);
+    const mouthOpen = mapMouthOpen(rms);
+    console.log("rms: ", rms)
+    setMorph(remoteAtatarFaceMesh, "MouthOpen", mouthOpen); // change name to your morph target
+  }
+
 }
