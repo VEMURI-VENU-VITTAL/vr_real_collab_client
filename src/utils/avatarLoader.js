@@ -196,12 +196,12 @@ export function animateLipSync() {
 
   for (const [remoteUserId, peer] of peers.entries()) {
     const remoteAtatarFaceMesh = avatarMap?.[remoteUserId]?.faceMesh
-    console.log(peer, "rms peer")
-    if (!peer.voice || !remoteAtatarFaceMesh) continue;
+    if (!peer.voice || !remoteAtatarFaceMesh){
+      continue
+    }
 
     const rms = getRmsLoudness(peer.voice.analyser, peer.voice.timeData);
     const mouthOpen = mapMouthOpen(rms);
-    console.log("rms: ", rms)
     setMorph(remoteAtatarFaceMesh, "MouthOpen", mouthOpen); // change name to your morph target
   }
 

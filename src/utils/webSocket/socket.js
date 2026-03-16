@@ -22,9 +22,7 @@ export function connectWebSocket() {
       isConnected = true;
         //listen to web socket
         subscribeToRoom(stompClient)
-
-        //make audio web rtc connections
-        audioWindowListeners()
+        audioWindowListeners(stompClient)
     },
 
     onDisconnect: () => {

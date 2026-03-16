@@ -9,7 +9,6 @@ export function createRemoteAvatar(event) {
     const activeUser = sessionStorage.getItem("userId");
     const sessionId = sessionStorage.getItem("sessionId");
     let remoteUser;
-
     if (activeUser === event.userId) return;
     if (event?.sessionId !== sessionId) return;
 

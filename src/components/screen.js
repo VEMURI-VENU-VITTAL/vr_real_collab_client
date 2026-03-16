@@ -1,7 +1,7 @@
 import { floorMeasurements } from "../utils/measurements";
 import * as THREE from "three"
 
-let video;
+let video = document.createElement("video");
 let screenMesh;
 export function addStream(stream){
   video.srcObject = stream;
@@ -11,7 +11,6 @@ export function addStream(stream){
 }
 
 export function addScreen(scene){
-    video = document.createElement("video");
     const texture = new THREE.VideoTexture(video);
     texture.colorSpace = THREE.SRGBColorSpace;
 

@@ -34,7 +34,7 @@ export const findSession = async(sessionId)=>{
     if(data.status=="SUCCESS"){
         sessionStorage.setItem("sessionId", data?.data?.id)
         redirect("/room")
-        avatarMap={}
+        Object.keys(avatarMap).forEach(key => delete avatarMap[key]);
     }
 }
 

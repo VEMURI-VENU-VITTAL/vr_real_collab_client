@@ -1,31 +1,29 @@
-import { disableMic, enableMicAndRenegotiate, joinVoiceRoom, micOff, micOn } from "./setup";
-import { connectWebSocket } from "../webSocket/socket";
+import {joinVoiceRoom } from "./setup";
 
-export async function audioWindowListeners(){
+export async function audioWindowListeners(stompClient){
     let isAudioOn = false
-    let stompClient = await connectWebSocket();
     let roomId = sessionStorage.getItem("sessionId")
     let myUserId = sessionStorage.getItem("userId")
-    let voiceSession = await joinVoiceRoom({
+    let voiceSession = await joinVoiceRoom(
                     stompClient,
                     roomId,
                     myUserId,
-                });
+                );
 
-    window.addEventListener("keydown", async (e)=>{
-        if(e.key.toLowerCase()=="m"){
-            if(!isAudioOn){
+    // window.addEventListener("keydown", async (e)=>{
+    //     if(e.key.toLowerCase()=="m"){
+    //         if(!isAudioOn){
                 
-                await enableMicAndRenegotiate()
+    //             await enableMicAndRenegotiate()
                 
-                isAudioOn=true
-            }
-            else{
-                if(voiceSession){
-                    disableMic()
-                    isAudioOn = false
-                }
-            }
-        }
-    })
+    //             isAudioOn=true
+    //         }
+    //         else{
+    //             if(voiceSession){
+    //                 disableMic()
+    //                 isAudioOn = false
+    //             }
+    //         }
+    //     }
+    // })
 }

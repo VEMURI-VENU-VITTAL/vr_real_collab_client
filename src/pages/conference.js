@@ -2,8 +2,7 @@ import * as THREE from "three"
 import { getCamera, initThree, setScene } from "../utils/initThree";
 import { animateLipSync, avatarKeyMovements, avatarLoader, getMixer } from "../utils/avatarLoader";
 import { Room } from "../components/room";
-import { startScreenShare } from "../utils/screenShare";
-import { addScreen, addStream } from "../components/screen";
+import { addScreen } from "../components/screen";
 import { connectWebSocket } from "../utils/webSocket/socket";
 import { avatarMap } from "../utils/remoteAvatars";
 
@@ -28,13 +27,6 @@ export function DiscussionRoom(canvas){
   sound.setBuffer(buffer);
   sound.setLoop(true);
   sound.setVolume(1.0);
-});
-
-  window.addEventListener("keydown", async (e) => {
-  if (e.key.toLowerCase() === "p") {
-    const stream = await startScreenShare();
-    addStream(stream, conferenceScene);
-  }
 });
 
 

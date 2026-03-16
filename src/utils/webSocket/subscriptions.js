@@ -7,7 +7,7 @@ export function subscribeToRoom(stompClient){
         return;
     }
 
-    return stompClient.subscribe(
+    stompClient.subscribe(
         `/topic/${roomId}/event`,
         (message)=>{
             const event = JSON.parse(message.body);
