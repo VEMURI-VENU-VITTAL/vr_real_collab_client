@@ -1,5 +1,5 @@
 import { redirect } from "./pageRouter";
-import { avatarMap } from "./remoteAvatars";
+import { avatarMap, createRemoteAvatar } from "./remoteAvatars";
 import { getCall, postcall } from "./routing"
 
 export const submitLogin=async (isRegister, userName, password)=>{
@@ -22,7 +22,7 @@ export const submitLogin=async (isRegister, userName, password)=>{
 }
 
 export const createSession = async(userId)=>{
-    const data = await postcall(import.meta.env.VITE_API_BASE+"session/create", userId);
+    let data = await postcall(import.meta.env.VITE_API_BASE+"session/create", userId);
     if(data.status=="SUCCESS"){
         sessionStorage.setItem("sessionId", data?.data?.id);
         redirect("/room")
@@ -30,11 +30,25 @@ export const createSession = async(userId)=>{
 }
 
 export const findSession = async(sessionId)=>{
-    const data = await getCall(import.meta.env.VITE_API_BASE+`session/find?sessionId=${sessionId}`);
+    let data = await getCall(import.meta.env.VITE_API_BASE+`session/find?sessionId=${sessionId}`);
     if(data.status=="SUCCESS"){
         sessionStorage.setItem("sessionId", data?.data?.id)
         redirect("/room")
         Object.keys(avatarMap).forEach(key => delete avatarMap[key]);
+    }
+}
+
+export const getAvatarEvents = async(roomId)=>{
+    let data = await getCall(import.meta.env.VITE_API_BASE+`event/fetch?roomId=${roomId}`);
+    if(data.status=="SUCCESS"){
+        data=data?.data
+        data?.forEach(avatarEvent=>{
+            if(avatarEvent){
+                console.log("avatar events", avatarEvent)
+                avatarEvent.eventType = "APPEARS"
+                createRemoteAvatar(avatarEvent);
+            }
+        })
     }
 }
 
