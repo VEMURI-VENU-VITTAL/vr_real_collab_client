@@ -20,7 +20,7 @@ export function createAvatarMovement(player, type){
 
     console.log("remote player moving event: ", event)
 
-    sendEvent(event.sessionId, event)
+    sendEvent(event)
 
     return event;
 }

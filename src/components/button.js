@@ -22,9 +22,9 @@ export function Button({
     btn.style.whiteSpace = whiteSpace
     btn.style.cursor = "pointer"
     if(isShadow){
-        btn.style.boxShadow = "0 10px 25px rgba(0,0,0,0.35)";
+        btn.style.boxShadow = "0 2px 2px rgba(0,0,0,0.1)";
         btn.style.transform = "translateZ(10px)";
-        btn.style.backdropFilter = "blur(4px)";
+        // btn.style.backdropFilter = "blur(4px)";
     }
 
     return btn;

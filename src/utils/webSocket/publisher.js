@@ -2,9 +2,12 @@ import { connectWebSocket, getStompClient, isSocketConnected } from "./socket";
 
 let stompClient = connectWebSocket();
 
-export function sendEvent(roomId, event) {
+export function sendEvent(event) {
+    const roomId = event.sessionId
+    console.log("debugger: user avatar movement: ", roomId)
+    const destination=`/app/room/${roomId}/event`
     stompClient.publish({
-      destination: `/app/room/${roomId}/event`,
+      destination: destination,
       body: JSON.stringify(event)
     });
   

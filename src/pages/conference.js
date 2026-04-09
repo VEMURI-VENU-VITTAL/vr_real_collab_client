@@ -3,17 +3,26 @@ import { getCamera, initThree, setScene } from "../utils/initThree";
 import { animateLipSync, avatarKeyMovements, avatarLoader, getMixer } from "../utils/avatarLoader";
 import { Room } from "../components/room";
 import { addScreen } from "../components/screen";
-import { connectWebSocket } from "../utils/webSocket/socket";
+import { connectWebSocket, getStompClient } from "../utils/webSocket/socket";
 import { avatarMap } from "../utils/remoteAvatars";
+import { getAvatarEvents } from "../utils/network";
+import {subscribeToRoom} from "../utils/webSocket/subscriptions"
 
 export let conferenceScene;
 export function DiscussionRoom(canvas){
   conferenceScene = new THREE.Scene();
   //connect to web socket
   connectWebSocket();
+  const stompCLient = getStompClient();
+
+  //subscribe to room
+  subscribeToRoom(stompCLient)
 
   //call audio setup code
   // audioWindowListeners()
+
+  //fetch peer avatars to the live
+  getAvatarEvents()
   
    initThree(canvas)
    const camera = getCamera();
@@ -24,10 +33,10 @@ export function DiscussionRoom(canvas){
 
    //add sound
    audioLoader.load("/testAudio.mp3", (buffer) => {
-  sound.setBuffer(buffer);
-  sound.setLoop(true);
-  sound.setVolume(1.0);
-});
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(1.0);
+  });
 
 
    camera.add(listener)

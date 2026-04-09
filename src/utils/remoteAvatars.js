@@ -51,14 +51,14 @@ export function createRemoteAvatar(event) {
 
         // UPDATE EXISTING AVATAR
         remoteUser = avatarMap[event.userId];
-        const remoteAvatar = remoteUser.avatar;
+        const remoteAvatar = remoteUser?.avatar;
 
         // Update position
-        remoteAvatar.position.set(
+        remoteAvatar?remoteAvatar?.position.set(
             event.position.x,
             event.position.y,
             event.position.z
-        );
+        ):"";
 
         // Update rotation
         remoteAvatar.quaternion.set(
@@ -72,14 +72,11 @@ export function createRemoteAvatar(event) {
     // Animation state handling
 
     if (event.eventType=="MOVEMENT") {
-        console.log("REMOTE USER MOVEMENT: ", remoteUser)
-
         remoteUser.idleAction.fadeOut(0.2);
         remoteUser.walkAction.reset().fadeIn(0.2).play();
     }
 
     if (event.eventType=="IDLE") {
-        console.log("REMOTE USER IDLE: ", remoteUser)
         remoteUser.walkAction.fadeOut(0.2);
         remoteUser.idleAction.reset().fadeIn(0.2).play();
 

@@ -1,7 +1,6 @@
 import { createRemoteAvatar } from "../remoteAvatars";
-import { getStompClient, isSocketConnected } from "./socket";
 
-export function subscribeToRoom(stompClient){
+export const subscribeToRoom = (stompClient)=>{
     const roomId = sessionStorage.getItem("sessionId")
     if(!stompClient){
         return;
@@ -11,6 +10,7 @@ export function subscribeToRoom(stompClient){
         `/topic/${roomId}/event`,
         (message)=>{
             const event = JSON.parse(message.body);
+            console.log("user avatar movement: ", event)
             createRemoteAvatar(event)
         }
     )

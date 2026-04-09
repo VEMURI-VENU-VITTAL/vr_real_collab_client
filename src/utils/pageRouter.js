@@ -13,8 +13,16 @@ const routes = {
 export const router = ()=>{
     const path = window.location.pathname;
     const view = routes[path] || "Login";
+    const sessionUser = sessionStorage.getItem("userId")
+    const sessionRoom = sessionStorage.getItem("sessionId")
     document.body.innerHTML = ""
     if(view=="DiscussionRoom"){
+        if(!sessionUser){
+            redirect("/")
+        }
+        else if(!sessionRoom){
+            redirect("/join")
+        }
         const canvas = document.createElement("canvas")
         document.body.appendChild(canvas);
         DiscussionRoom(canvas)
@@ -26,6 +34,12 @@ export const router = ()=>{
         document.body.appendChild(LoginPage(true))
     }
     else{
+        if(!sessionUser){
+            redirect("/")
+        }
+        else if(!sessionRoom){
+            redirect("/join")
+        }
         document.body.appendChild(view());
     }
 }

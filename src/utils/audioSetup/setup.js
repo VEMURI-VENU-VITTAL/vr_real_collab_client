@@ -235,6 +235,9 @@ export async function startScreenShare() {
 
   const screenTrack = screenStream.getVideoTracks()[0];
 
+  //adding media track to the screen in the room
+  addStream(screenStream);
+
   peers.forEach(peer => {
     let sender = peer.pc.getSenders().find(s => s.track?.kind === "video");
     console.log("sender for vedio: ", sender)
@@ -261,11 +264,14 @@ export async function stopScreenShare() {
 }
 
 window.addEventListener("keydown", async (e) => {
+  const isHost = sessionStorage.getItem("isHost")
+  if(isHost){
   if (e.key.toLowerCase() === "p") {
-    if (!isScreenSharing) {
-      await startScreenShare();
-    } else {
-      await stopScreenShare();
+      if (!isScreenSharing) {
+        await startScreenShare();
+      } else {
+        await stopScreenShare();
+      }
     }
   }
 });
