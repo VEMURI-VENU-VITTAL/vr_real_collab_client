@@ -1,3 +1,4 @@
+import { Directions } from "../components/directions";
 import { DiscussionRoom } from "../pages/conference";
 import { JoinSession } from "../pages/join";
 import { LoginPage } from "../pages/login";
@@ -12,20 +13,29 @@ const routes = {
 
 export const router = ()=>{
     const path = window.location.pathname;
-    const view = routes[path] || "Login";
+    let view = routes[path] || "Login";
     const sessionUser = sessionStorage.getItem("userId")
     const sessionRoom = sessionStorage.getItem("sessionId")
     document.body.innerHTML = ""
-    if(view=="DiscussionRoom"){
-        if(!sessionUser){
-            redirect("/")
+    if (view == "DiscussionRoom") {
+        if (!sessionUser) {
+            redirect("/");
+        } else if (!sessionRoom) {
+            redirect("/join");
         }
-        else if(!sessionRoom){
-            redirect("/join")
-        }
-        const canvas = document.createElement("canvas")
-        document.body.appendChild(canvas);
-        DiscussionRoom(canvas)
+
+        const container = document.createElement("div");
+        container.id = "app-container";
+
+        const canvas = document.createElement("canvas");
+        const directionBlock = Directions();
+
+        container.appendChild(canvas);
+        container.appendChild(directionBlock);
+
+        document.body.appendChild(container);
+
+        DiscussionRoom(canvas);
     }
     else if(view=="Login"){
         document.body.appendChild(LoginPage(false))
@@ -38,7 +48,7 @@ export const router = ()=>{
             redirect("/")
         }
         else if(!sessionRoom){
-            redirect("/join")
+            view = JoinSession
         }
         document.body.appendChild(view());
     }

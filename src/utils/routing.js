@@ -4,7 +4,7 @@ export const postcall=async (url, input)=>{
         headers:{
             "Content-Type":"application/json"
         },
-        body:input || ""
+        body:input? JSON.stringify(input):""
     })
 
     const data = await response.json()

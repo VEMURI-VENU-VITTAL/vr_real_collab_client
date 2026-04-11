@@ -9,6 +9,7 @@ export const submitLogin=async (isRegister, userName, password)=>{
     }
     let data;
     if(isRegister){
+        console.log("debugger register: ", input)
     data = await postcall(import.meta.env.VITE_API_BASE+"user/create", input)
     }
     else{
@@ -53,7 +54,6 @@ export const getAvatarEvents = async()=>{
         data=data?.data
         data?.forEach(avatarEvent=>{
             if(avatarEvent){
-                console.log("avatar events", avatarEvent)
                 avatarEvent.eventType = "APPEARS"
                 createRemoteAvatar(avatarEvent);
             }

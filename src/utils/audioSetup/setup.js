@@ -4,6 +4,7 @@ import { createVoiceAnalyser } from "./analyzer";
 let stompClientGlobal, roomIdGlobal, myUserIdGlobal;
 let isScreenSharing = false;
 let screenStream;
+let prevYPressed = false;
 
 // -------------------- CONFIG --------------------
 const SIGNAL_SUB = (roomId) => `/topic/room/${roomId}/signal`;
@@ -22,7 +23,6 @@ export const peers = new Map();
 
 function isMessageRelevant(data){
   if(data.from==myUserIdGlobal || data.roomId!=roomIdGlobal){
-    console.log("is relevant message: ", data)
     return false 
   }
   return true
@@ -69,9 +69,6 @@ function createPeer(remoteUserId){
       }
       audio.srcObject=remoteStream;
     }
-    if(track.kind=="video"){
-      console.log("screen sharing track")
-    }
     const peer = peers.get(remoteUserId);
 
     if (peer && !peer.voice) {
@@ -97,7 +94,6 @@ function createPeer(remoteUserId){
 }
 
 function subscribeSignal(stompClient, roomId, userId){
-
   stompClient.subscribe(SIGNAL_SUB(roomId), async (msg)=>{
 
     const data = JSON.parse(msg.body);
@@ -107,7 +103,6 @@ function subscribeSignal(stompClient, roomId, userId){
     const remoteUserId = data.from;
     let peer = peers.get(remoteUserId);
     if(!peer) peer = createPeer(remoteUserId);
-    console.log("peer status: ", peers)
     switch(data.type){
 
       case "join":
@@ -115,11 +110,14 @@ function subscribeSignal(stompClient, roomId, userId){
         break;
 
       case "offer":
+        if (peer.pc.signalingState !== "stable") return;
         await handleOffer(peer, data.sdp);
         break;
 
       case "answer":
-        await peer.pc.setRemoteDescription(new RTCSessionDescription(data?.sdp));
+        if (peer.pc.signalingState === "have-local-offer") {
+          await peer.pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        }
         break;
 
       case "ice":
@@ -167,13 +165,19 @@ export async function sendOffer(peer){
     localStream = await navigator.mediaDevices.getUserMedia({audio:true});
   }
 
-  localStream.getTracks().forEach(track=>{
+  screenStream = screenStream?screenStream:new MediaStream()
+
+  const stream = new MediaStream([
+    ...localStream.getTracks(), ...screenStream.getTracks()
+  ])
+
+  stream.getTracks().forEach(track=>{
     const alreadySending = pc.getSenders().some(
       sender => sender.track && sender.track.id === track.id
     );
 
     if(!alreadySending){
-      pc.addTrack(track, localStream);
+      pc.addTrack(track, stream);
     }
   });
 
@@ -198,13 +202,19 @@ async function handleOffer(peer, sdp){
     localStream = await navigator.mediaDevices.getUserMedia({audio:true});
   }
 
-  localStream.getTracks().forEach(track=>{
+  screenStream = screenStream?screenStream:new MediaStream()
+
+  const stream = new MediaStream([
+    ...localStream.getTracks(), ...screenStream.getTracks()
+  ])
+
+  stream.getTracks().forEach(track=>{
     const alreadySending = pc.getSenders().some(
       sender => sender.track && sender.track.id === track.id
     );
 
     if(!alreadySending){
-      pc.addTrack(track, localStream);
+      pc.addTrack(track, stream);
     }
   });
 
@@ -214,7 +224,7 @@ async function handleOffer(peer, sdp){
 export async function sendAnswer(peer){
 
   const pc = peer.pc;
-
+  
   const answer = await pc.createAnswer();
   await pc.setLocalDescription(answer);
 
@@ -240,11 +250,9 @@ export async function startScreenShare() {
 
   peers.forEach(peer => {
     let sender = peer.pc.getSenders().find(s => s.track?.kind === "video");
-    console.log("sender for vedio: ", sender)
     if(sender){
       sender.replaceTrack(screenTrack);
     }else{
-      console.log("sender for vedio inside: ", screenTrack)
       peer.pc.addTrack(screenTrack, screenStream);
       sendOffer(peer)
     }
@@ -263,21 +271,42 @@ export async function stopScreenShare() {
   isScreenSharing = false;
 }
 
-window.addEventListener("keydown", async (e) => {
+async function toggleShareScreen(){
   const isHost = sessionStorage.getItem("isHost")
   if(isHost){
-  if (e.key.toLowerCase() === "p") {
-      if (!isScreenSharing) {
-        await startScreenShare();
-      } else {
-        await stopScreenShare();
-      }
+    if (!isScreenSharing) {
+      await startScreenShare();
+    } else {
+      await stopScreenShare();
     }
+  }
+}
+
+window.addEventListener("keydown", async (e) => {
+  if(e.key.toLowerCase() === "p"){
+    toggleShareScreen()
   }
 });
 
+//control screen sharing using controller
+export function checkController() {
+  const gamepad = navigator.getGamepads()[0];
+
+  if (gamepad) {
+    const yPressed = gamepad.buttons[3].pressed; // Y button
+
+    // Trigger only on press (not hold)
+    if (yPressed && !prevYPressed) {
+      toggleShareScreen();
+    }
+
+    prevYPressed = yPressed;
+  }
+
+  requestAnimationFrame(checkController);
+}
+
 export async function leaveVoiceRoom() {
-  console.log("Leaving room");
 
   // notify others
   publishSignal(stompClientGlobal, roomIdGlobal, {

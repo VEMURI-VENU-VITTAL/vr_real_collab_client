@@ -5,13 +5,17 @@ export const subscribeToRoom = (stompClient)=>{
     if(!stompClient){
         return;
     }
-
-    stompClient.subscribe(
-        `/topic/${roomId}/event`,
-        (message)=>{
-            const event = JSON.parse(message.body);
-            console.log("user avatar movement: ", event)
-            createRemoteAvatar(event)
-        }
-    )
+    try{
+        stompClient.subscribe(
+            `/topic/${roomId}/event`,
+            (message)=>{
+                const event = JSON.parse(message.body);
+                console.log("user avatar movement: ", event)
+                createRemoteAvatar(event)
+            }
+        )
+    }
+    catch(e){
+        console.log("error in web socket subscription")
+    }
 }

@@ -7,6 +7,7 @@ import { connectWebSocket, getStompClient } from "../utils/webSocket/socket";
 import { avatarMap } from "../utils/remoteAvatars";
 import { getAvatarEvents } from "../utils/network";
 import {subscribeToRoom} from "../utils/webSocket/subscriptions"
+import { checkController } from "../utils/audioSetup/setup";
 
 export let conferenceScene;
 export function DiscussionRoom(canvas){
@@ -18,8 +19,8 @@ export function DiscussionRoom(canvas){
   //subscribe to room
   subscribeToRoom(stompCLient)
 
-  //call audio setup code
-  // audioWindowListeners()
+  //check for screen sharing using controller
+  checkController()
 
   //fetch peer avatars to the live
   getAvatarEvents()

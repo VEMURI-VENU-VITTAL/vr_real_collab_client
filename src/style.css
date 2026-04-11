@@ -1,4 +1,4 @@
-:root {
+/* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -94,4 +94,43 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+} */
+
+#app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+}
+
+canvas {
+  pointer-events: auto;
+}
+
+.overlay-text {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  background: rgba(0, 0, 0, 0.4); /* low transparency */
+  color: white;
+
+  padding: 10px 14px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-family: monospace;
+
+  cursor: pointer;
+  z-index: 1000;
+
+  user-select: none;
+}
+
+#overlay-text:hover {
+  background: rgba(0, 0, 0, 0.7);
 }

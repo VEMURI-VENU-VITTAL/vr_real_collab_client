@@ -12,6 +12,7 @@ export function createRemoteAvatar(event) {
     if (activeUser === event.userId) return;
     if (event?.sessionId !== sessionId) return;
 
+
     // CREATE NEW AVATAR
     if (!avatarMap[event.userId]) {
 
@@ -29,7 +30,19 @@ export function createRemoteAvatar(event) {
             avatarWrapper.add(newAvatar)
 
             avatarWrapper.scale.set(0.8, 0.8, 0.8)
-            avatarWrapper.position.set(0,0,0)
+            avatarWrapper.position.set(
+                event.position.x,
+                event.position.y,
+                event.position.z
+            );
+            avatarWrapper.quaternion.set(
+                event.quaternion.x,
+                event.quaternion.y,
+                event.quaternion.z,
+                event.quaternion.w
+            )
+
+            // avatarWrapper.position.set(0,0,0)
 
             avatarMap[event.userId] = {
                 avatar: avatarWrapper,
@@ -61,12 +74,12 @@ export function createRemoteAvatar(event) {
         ):"";
 
         // Update rotation
-        remoteAvatar.quaternion.set(
+        remoteAvatar?.quaternion?remoteAvatar?.quaternion.set(
             event.quaternion.x,
             event.quaternion.y,
             event.quaternion.z,
             event.quaternion.w
-        );
+        ):console.log(remoteUser, "remote avatar quaternion");
     }
 
     // Animation state handling

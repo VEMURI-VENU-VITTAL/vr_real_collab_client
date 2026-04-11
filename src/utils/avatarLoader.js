@@ -25,7 +25,6 @@ export function createAvatar() {
 
         newAvatar.rotation.y = Math.PI;
 
-        console.log("morph: ", newAvatar)
         newAvatar.traverse((obj) => {
           if (obj.isMesh && obj.morphTargetDictionary) {
             newFaceMesh = obj;
@@ -37,7 +36,6 @@ export function createAvatar() {
 
         const newMixer = new THREE.AnimationMixer(newAvatar);
 
-        console.log("animations: ", newGltf.animations)
         const newWalkAction = newMixer.clipAction(
           newGltf.animations.find((animation)=>animation.name=="Walk")
         )
@@ -59,7 +57,6 @@ export function createAvatar() {
 
         newIdleAction.play()
 
-        console.log("facemesh; ", newFaceMesh)
 
         // resolve ONLY when ready
         resolve({ newAvatar, newFaceMesh, newMixer, newWalkAction, newIdleAction });
@@ -104,58 +101,76 @@ export function getMixer() {
   return mixer;
 }
 
+//gamepad helper function
+function getGamepadInput() {
+  const gamepad = navigator.getGamepads()[0];
+  if (!gamepad) return null;
+
+  return {
+    forward: gamepad.axes[1] < -0.2,   // left stick up
+    backward: gamepad.axes[1] > 0.2,   // left stick down
+    left: gamepad.axes[0] < -0.2,      // left stick left
+    right: gamepad.axes[0] > 0.2,      // left stick right
+  };
+}
+
 export function avatarKeyMovements(camera) {
-  const isPlayerMoved = keys["w"] || keys["s"] || keys["a"] || keys["d"];
   if (!player) return;
-  
+
   const moveSpeed = 0.005;
   const rotateSpeed = 0.006;
-  if(isPlayerMoved){
+
+  // 🎮 Get controller input
+  const gamepadInput = getGamepadInput();
+
+  // ✅ Combine keyboard + controller
+  const forward = keys["w"] || gamepadInput?.forward;
+  const backward = keys["s"] || gamepadInput?.backward;
+  const left = keys["a"] || gamepadInput?.left;
+  const right = keys["d"] || gamepadInput?.right;
+
+  const isPlayerMoved = forward || backward || left || right;
+
+  if (isPlayerMoved) {
 
     // ▶ START WALK
     if (!isWalking) {
       idleAction.fadeOut(0.3);
-      walkAction
-        .reset()
-        .fadeIn(0.3)
-        .play();
+      walkAction.reset().fadeIn(0.3).play();
       isWalking = true;
 
-      createAvatarMovement(player, "MOVEMENT")
+      createAvatarMovement(player, "MOVEMENT");
     }
 
-    if (keys["w"]) {
+    if (forward) {
       player.translateZ(-moveSpeed);
     }
 
-    if (keys["s"]) {
+    if (backward) {
       player.translateZ(moveSpeed);
     }
 
-    if (keys["a"]) {
+    if (left) {
       player.rotation.y += rotateSpeed;
     }
 
-    if (keys["d"]) {
+    if (right) {
       player.rotation.y -= rotateSpeed;
     }
 
     updateThirdPersonCamera(player, camera);
-    
-    //publish avatar position
-    createAvatarMovement(player, "MOVING")
+
+    // publish avatar position
+    createAvatarMovement(player, "MOVING");
   }
 
   if (!isPlayerMoved && isWalking) {
     walkAction.fadeOut(0.3);
-    idleAction
-      .reset()
-      .fadeIn(0.3)
-      .play();
+    idleAction.reset().fadeIn(0.3).play();
     isWalking = false;
-    createAvatarMovement(player, "IDLE")
-  }
 
+    createAvatarMovement(player, "IDLE");
+  }
 }
 
 

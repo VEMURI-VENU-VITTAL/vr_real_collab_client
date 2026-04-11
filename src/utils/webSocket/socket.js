@@ -2,6 +2,7 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { audioWindowListeners } from "../audioSetup/audioListener";
 import { getAvatarEvents } from "../network";
+import { subscribeToRoom } from "./subscriptions";
 
 let stompClient = null;
 let isConnected = false;
@@ -18,11 +19,15 @@ export function connectWebSocket() {
     debug: (str) => console.log("[WS]", str),
 
     onConnect: () => {
+      stompClient.activate()
       console.log("WebSocket connected");
       const sessionId = sessionStorage.getItem("sessionId")
       isConnected = true;
         //listen to web socket
+        console.log("debugger for socker: ", stompClient)
         audioWindowListeners(stompClient)
+        //subscribe to room
+        subscribeToRoom(stompClient)
         if(sessionId){
           getAvatarEvents()
         } 
