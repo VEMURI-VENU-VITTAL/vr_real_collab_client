@@ -153,6 +153,7 @@ export function avatarKeyMovements(camera) {
   // 🎮 Get controller input
   const gamepadInput = getGamepadInput();
 
+
   // ✅ Combine keyboard + controller
   const forward = keys["w"] || gamepadInput?.forward;
   const backward = keys["s"] || gamepadInput?.backward;

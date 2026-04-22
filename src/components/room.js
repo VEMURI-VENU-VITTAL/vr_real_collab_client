@@ -6,7 +6,11 @@ export function Room() {
   const textureLoader = new THREE.TextureLoader();
 
   // Floor
-  const floorTexture = textureLoader.load("/textures/chessTiles/Tiles012.png")
+  const floorTexture = textureLoader.load("/textures/floor1.png")
+  //Wall Texture
+  const wallTexture = textureLoader.load("/textures/floor.png")
+  wallTexture.wrapS = THREE.RepeatWrapping
+  wallTexture.wrapT = THREE.RepeatWrapping
   floorTexture.wrapS = THREE.RepeatWrapping;
   floorTexture.wrapT = THREE.RepeatWrapping;
 
@@ -33,7 +37,7 @@ export function Room() {
     ),
     new THREE.MeshStandardMaterial({ color: 0xdcdcdc, 
         side: THREE.DoubleSide,
-
+        map: wallTexture
      })
   );
   frontWall.position.z = -floorMeasurements.height / 2;
@@ -46,7 +50,7 @@ export function Room() {
       facingWallsMeasurements.width,
       facingWallsMeasurements.height
     ),
-    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide, map: wallTexture })
   );
   backWall.position.z = floorMeasurements.height / 2;
   backWall.position.y = facingWallsMeasurements.height / 2;
@@ -58,7 +62,7 @@ export function Room() {
       sideWallsMeasurements.width,
       sideWallsMeasurements.height
     ),
-    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide, map: wallTexture })
   );
   rightWall.position.x = floorMeasurements.width / 2;
   rightWall.position.y = sideWallsMeasurements.height / 2;
@@ -70,7 +74,7 @@ export function Room() {
       sideWallsMeasurements.width,
       sideWallsMeasurements.height
     ),
-    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide, map: wallTexture })
   );
   leftWall.position.x = -floorMeasurements.width / 2;
   leftWall.position.y = sideWallsMeasurements.height / 2;
