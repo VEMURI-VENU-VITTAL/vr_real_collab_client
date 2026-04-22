@@ -67,6 +67,34 @@ export function createAvatar() {
   });
 }
 
+export function createNameLabel(text, position=[0,2,0]) {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  canvas.width = 256;
+  canvas.height = 64;
+
+  context.fillStyle = "rgba(0,0,0,0)";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.font = "28px Arial";
+  context.fillStyle = "white";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+
+  const material = new THREE.SpriteMaterial({ map: texture });
+  const sprite = new THREE.Sprite(material);
+
+  sprite.scale.set(0.7, 0.2, 1); // adjust size
+
+  sprite.position.set(...position)
+
+  return sprite;
+}
+
 
 export function avatarLoader(scene) {
   createAvatar().then(({ newAvatar, newFaceMesh, newMixer, newWalkAction, newIdleAction }) => {
@@ -78,6 +106,8 @@ export function avatarLoader(scene) {
     idleAction = newIdleAction
   
     player = new THREE.Group();
+    const nameTitle = createNameLabel("🔻", [0,1.6,0])
+    player.add(nameTitle)
     player.add(avatar)
 
     avatar.scale.set(0.8,0.8,0.8)
@@ -220,4 +250,9 @@ export function animateLipSync() {
     setMorph(remoteAtatarFaceMesh, "MouthOpen", mouthOpen); // change name to your morph target
   }
 
+}
+
+export function avatarLeavingRoom(){
+  console.log("")
+  createAvatarMovement(player, "QUIT")
 }

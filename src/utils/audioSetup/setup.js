@@ -1,4 +1,5 @@
 import { addStream } from "../../components/screen";
+import { avatarLeavingRoom } from "../avatarLoader";
 import { createVoiceAnalyser } from "./analyzer";
 
 let stompClientGlobal, roomIdGlobal, myUserIdGlobal;
@@ -315,6 +316,7 @@ export async function leaveVoiceRoom() {
     roomId: roomIdGlobal
   });
 
+  avatarLeavingRoom()
   // close peer connections
   peers.forEach(peer => {
     peer.pc.close();

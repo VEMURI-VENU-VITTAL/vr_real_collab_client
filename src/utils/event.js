@@ -3,6 +3,7 @@ import { sendEvent } from "./webSocket/publisher";
 export function createAvatarMovement(player, type){
     const event = {
       userId:sessionStorage.getItem("userId"),
+      userName:sessionStorage.getItem("userName"),
       sessionId:sessionStorage.getItem("sessionId"),
       eventType:type,
       position:{

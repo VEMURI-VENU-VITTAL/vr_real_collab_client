@@ -1,5 +1,5 @@
 import { conferenceScene } from "../pages/conference";
-import { createAvatar } from "./avatarLoader";
+import { createAvatar, createNameLabel } from "./avatarLoader";
 import * as THREE from "three"
 
 export let avatarMap = {};
@@ -12,6 +12,16 @@ export function createRemoteAvatar(event) {
     if (activeUser === event.userId) return;
     if (event?.sessionId !== sessionId) return;
 
+    if(event.eventType=="QUIT"){
+        const avatarToBeRemoved = conferenceScene.getObjectByName(event.userId)
+        console.log("debugger: going inside remove")
+        if(avatarToBeRemoved){
+            console.log("debug: remov avatar")
+            conferenceScene.remove(avatarToBeRemoved)
+            delete avatarMap[event?.userId]
+        }
+        return
+    }
 
     // CREATE NEW AVATAR
     if (!avatarMap[event.userId]) {
@@ -27,6 +37,9 @@ export function createRemoteAvatar(event) {
         }) => {
 
             const avatarWrapper = new THREE.Group()
+            avatarWrapper.name=event.userId
+            const nameTitle = createNameLabel(event.userName);
+            avatarWrapper.add(nameTitle)
             avatarWrapper.add(newAvatar)
 
             avatarWrapper.scale.set(0.8, 0.8, 0.8)
