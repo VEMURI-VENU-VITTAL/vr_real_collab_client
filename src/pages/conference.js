@@ -10,11 +10,14 @@ import {subscribeToRoom} from "../utils/webSocket/subscriptions"
 import { checkController } from "../utils/audioSetup/setup";
 
 export let conferenceScene;
+export let conferenceRoom;
 export function DiscussionRoom(canvas){
   conferenceScene = new THREE.Scene();
   //connect to web socket
-  connectWebSocket();
-  const stompCLient = getStompClient();
+  // connectWebSocket()
+  let stompCLient = getStompClient();
+  stompCLient = stompCLient?stompCLient:connectWebSocket
+
 
   //subscribe to room
   subscribeToRoom(stompCLient)
@@ -39,8 +42,6 @@ export function DiscussionRoom(canvas){
     sound.setVolume(1.0);
   });
 
-
-   camera.add(listener)
    conferenceScene.background = new THREE.Color(0xeeeeee)
    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
    conferenceScene.add(ambientLight)
@@ -53,8 +54,8 @@ export function DiscussionRoom(canvas){
   //  const controls = new OrbitControls(camera, canvas);
   //  controls.enableDamping = true
    
-  const room = Room()
-  conferenceScene.add(room)
+  conferenceRoom = Room()
+  conferenceScene.add(conferenceRoom)
 
   //add screen to room
   addScreen(conferenceScene)
@@ -62,7 +63,6 @@ export function DiscussionRoom(canvas){
     //add avatar to the room
     avatarLoader(conferenceScene)
 
-   camera.position.set(0,2,4.5);
    
    setScene(conferenceScene, ()=>{
     // controls.update()

@@ -36,8 +36,7 @@ export function Room() {
       facingWallsMeasurements.height
     ),
     new THREE.MeshStandardMaterial({ color: 0xdcdcdc, 
-        side: THREE.DoubleSide,
-        map: wallTexture
+        side: THREE.DoubleSide
      })
   );
   frontWall.position.z = -floorMeasurements.height / 2;
@@ -50,7 +49,7 @@ export function Room() {
       facingWallsMeasurements.width,
       facingWallsMeasurements.height
     ),
-    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide, map: wallTexture })
+    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide })
   );
   backWall.position.z = floorMeasurements.height / 2;
   backWall.position.y = facingWallsMeasurements.height / 2;
@@ -62,7 +61,7 @@ export function Room() {
       sideWallsMeasurements.width,
       sideWallsMeasurements.height
     ),
-    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide, map: wallTexture })
+    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide})
   );
   rightWall.position.x = floorMeasurements.width / 2;
   rightWall.position.y = sideWallsMeasurements.height / 2;
@@ -74,7 +73,7 @@ export function Room() {
       sideWallsMeasurements.width,
       sideWallsMeasurements.height
     ),
-    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide, map: wallTexture })
+    new THREE.MeshStandardMaterial({ color: 0xdcdcdc, side: THREE.DoubleSide })
   );
   leftWall.position.x = -floorMeasurements.width / 2;
   leftWall.position.y = sideWallsMeasurements.height / 2;

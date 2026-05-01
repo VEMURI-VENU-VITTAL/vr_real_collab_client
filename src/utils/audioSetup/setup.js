@@ -111,14 +111,14 @@ function subscribeSignal(stompClient, roomId, userId){
         break;
 
       case "offer":
-        if (peer.pc.signalingState !== "stable") return;
+
         await handleOffer(peer, data.sdp);
-        break;
+    
 
       case "answer":
-        if (peer.pc.signalingState === "have-local-offer") {
-          await peer.pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-        }
+
+        await peer.pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        
         break;
 
       case "ice":

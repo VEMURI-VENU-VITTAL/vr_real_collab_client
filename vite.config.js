@@ -14,7 +14,8 @@ export default defineConfig({
       "localhost",
       "127.0.0.1",
       "10.16.49.37",
-      "waves-folders-seed-modelling.trycloudflare.com"
+      "https://passes-sub-neural-commitment.trycloudflare.com",
+      "fat-bouquet-youth-maximum.trycloudflare.com"
     ]
   }
 });
